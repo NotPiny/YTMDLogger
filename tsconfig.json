@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES2016",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "lib": [
+            "ESNext"
+        ],
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "sourceMap": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
+}
