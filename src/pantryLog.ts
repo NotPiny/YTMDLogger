@@ -3,6 +3,7 @@ import { LogEventType } from './types.ts';
 import type { StateOutput } from 'ytmdesktop-ts-companion';
 
 const path = `https://getpantry.cloud/apiv1/pantry/${process.env.PANTRY_ID}/basket/${process.env.PANTRY_BASKET ?? 'logs'}`;
+const historyLengthLimit = parseInt(process.env.PANTRY_LIMIT ?? '15');
 
 interface PantryBasketData {
     history: PantryHistoryLogEntry[];
@@ -49,8 +50,8 @@ export default async function log(state: StateOutput, type: LogEventType) {
     try {
         cache.history = cache?.history?.concat(queue) || []; // Add the queue to the local cache to ensure it doesnt get missed in future requests
 
-        if (cache.history.length >= 15) // We only have 1.44MB of storage, so we need to keep it small and only keep the last 15 logs (realistically, we will probably only display the last 5)
-            cache.history = cache.history.slice(-15);
+        if (cache.history.length >= historyLengthLimit) // We only have 1.44MB of storage, so we need to keep it small and only keep the last 15 logs (realistically, we will probably only display the last 5)
+            cache.history = cache.history.slice(-historyLengthLimit);
 
         await axios.post(path, { // Have to use POST instead of PUT because we want to overwrite the existing data
             history: cache.history
