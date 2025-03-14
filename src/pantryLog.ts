@@ -39,7 +39,8 @@ export default async function log(state: StateOutput, type: LogEventType) {
             id: state?.video?.id,
             title: state?.video?.title,
             author: state?.video?.author,
-            cover: state?.video?.thumbnails[0].url
+            cover: state?.video?.thumbnails[0].url,
+            duration: state?.video?.durationSeconds
         },
         type,
         time: Date.now()
