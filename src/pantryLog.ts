@@ -20,6 +20,7 @@ interface PantryHistoryLogEntry {
     time: number;
 }
 
+let cacheLoaded = false; // Don't send logs until the cache is loaded to prevent data loss
 let cache: PantryBasketData = { // Contains blank data to fix "Cannot set properties of undefined" error
     history: []
 };
@@ -28,8 +29,15 @@ let queue: PantryHistoryLogEntry[] = [];
 (async() => {
     if (!process.env.PANTRY_ID) return;
 
-    const resp = await axios.get(path);
-    cache = resp.data;
+    try {
+        const resp = await axios.get(path);
+        cache = resp.data;
+
+        cacheLoaded = true;
+        console.log('Pantry log cache loaded');
+    } catch (error) {
+        console.error(error);
+    }
 })();
 
 export default async function log(state: StateOutput, type: LogEventType) {
@@ -47,6 +55,8 @@ export default async function log(state: StateOutput, type: LogEventType) {
     }
 
     queue.push(logObj); // In the event of a failure, we can retry sending the event bundled with the next one
+
+    while (!cacheLoaded) await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for the cache to load before sending logs
 
     try {
         cache.history = cache?.history?.concat(queue) || []; // Add the queue to the local cache to ensure it doesnt get missed in future requests
